@@ -10,12 +10,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# collectstatic needs a secret key but not a real DB
+# collectstatic only — no DB needed at build time
 RUN DJANGO_SECRET_KEY=build-time-placeholder \
     DJANGO_DEBUG=False \
     python manage.py collectstatic --noinput
 
+RUN chmod +x release.sh
+
 EXPOSE 8000
 
-# Railway overrides this via railway.json startCommand (migrate + ensure_superuser + gunicorn)
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"]
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "120"]
