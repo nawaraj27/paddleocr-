@@ -13,7 +13,7 @@ def healthz(request):
 
 
 urlpatterns = [
-    path("healthz/", name="healthz"),
+    path("healthz/",healthz, name="healthz"),
     path("admin/", admin.site.urls),
     path("", LandingView.as_view(), name="landing"),
     path("auth/", include("apps.users.urls")),
