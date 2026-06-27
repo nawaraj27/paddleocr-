@@ -1,45 +1,64 @@
 """Management command: create a superuser from env vars if none exists.
 
-Environment variables (all optional — falls back to safe defaults):
-    SUPERUSER_USERNAME   default: admin
-    SUPERUSER_EMAIL      default: admin@example.com
-    SUPERUSER_PASSWORD   default: Admin1234!demo
+Environment variables:
+    SUPERUSER_USERNAME   (required) username for the superuser account
+    SUPERUSER_EMAIL      (required) email address for the superuser account
+    SUPERUSER_PASSWORD   (required) password for the superuser account
 
+Falls back to safe defaults so the command never hangs waiting for input.
 Run automatically on Railway deploy via railway.json startCommand.
 Idempotent — safe to run on every deploy.
 """
 import os
+import sys
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    help = "Create a superuser from env vars if no superuser exists."
+    help = "Create a superuser from env vars if none exists. Fully non-interactive."
 
     def handle(self, *args, **options):
         User = get_user_model()
-
-        if User.objects.filter(is_superuser=True).exists():
-            self.stdout.write(self.style.SUCCESS(
-                "Superuser already exists — skipping creation."))
-            return
 
         username = os.environ.get("SUPERUSER_USERNAME", "admin")
         email = os.environ.get("SUPERUSER_EMAIL", "admin@example.com")
         password = os.environ.get("SUPERUSER_PASSWORD", "Admin1234!demo")
 
-        user = User.objects.create_superuser(
-            username=username,
-            email=email,
-            password=password,
-        )
-        # Also mark as approved + admin role so they can log in immediately
-        user.is_approved = True
-        user.is_active = True
-        user.role = User.Role.ADMIN
-        user.save(update_fields=["is_approved", "is_active", "role"])
+        # If a superuser with this username already exists, update email/password
+        # and ensure the account is active — then exit cleanly.
+        try:
+            user = User.objects.get(username=username)
+            if not user.is_superuser:
+                user.is_superuser = True
+                user.is_staff = True
+            user.email = email
+            user.set_password(password)
+            user.is_approved = True
+            user.is_active = True
+            user.role = User.Role.ADMIN
+            user.save(update_fields=[
+                "email", "password", "is_superuser", "is_staff",
+                "is_approved", "is_active", "role", "updated_at",
+            ])
+            self.stdout.write(self.style.SUCCESS(
+                f"Superuser already exists — updated: username='{username}' "
+                f"email='{email}'"))
+            return
+        except User.DoesNotExist:
+            pass
 
-        self.stdout.write(self.style.SUCCESS(
-            f"Superuser created: username='{username}' email='{email}' "
-            f"(set SUPERUSER_PASSWORD env var to change the password)"))
+        # No matching user found — create one from scratch.
+        try:
+            User.objects.create_superuser(
+                username=username,
+                email=email,
+                password=password,
+            )
+            self.stdout.write(self.style.SUCCESS(
+                f"Superuser created: username='{username}' email='{email}'"))
+        except Exception as exc:  # noqa: BLE001
+            self.stderr.write(self.style.ERROR(
+                f"Failed to create superuser: {exc}"))
+            sys.exit(1)
