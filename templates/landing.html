@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>mero dokan — Revenue-first analytics</title>
+  <title>{{ site.brand_name|default:"Mero Dokan" }} — {{ site.hero_headline|default:"Revenue-first analytics" }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/datafast.css' %}">
@@ -12,33 +12,33 @@
 <body>
 <div class="container">
   <nav class="nav">
-    <div class="logo"><span class="mark">md</span> Mero Dokan</div>
+    <div class="logo"><span class="mark">df</span> {{ site.brand_name|default:"Mero Dokan" }}</div>
     <div class="nav-links">
-      <a href="#pricing">Pricing</a>
-      <a href="#faq">FAQ</a>
-      <a href="#reviews">Reviews</a>
+      {% for l in nav_links %}<a href="{{ l.href }}">{{ l.label }}</a>{% empty %}
+        <a href="#features">Features</a><a href="#download">Download</a>{% endfor %}
     </div>
     <a class="btn sm" href="{% url 'users:login' %}">Log in</a>
   </nav>
 
   <header class="hero">
-    <h1><span class="hl">Revenue-first</span> analytics</h1>
-    <p class="sub">Turn invoices and bills into structured data and decisions —
-       extract, store, and analyze your documents, fast.</p>
+    {% with hl=site.hero_highlight|default:"Revenue-first" hd=site.hero_headline|default:"Revenue-first analytics" %}
+      <h1>{% if hl and hl in hd %}{{ hd|cut:hl }}<span class="hl">{{ hl }}</span>{% else %}<span class="hl">{{ hd }}</span>{% endif %}</h1>
+    {% endwith %}
+    <p class="sub">{{ site.hero_subheadline|default:"Turn receipts and bills into stock, sales and insight, fast." }}</p>
     <form class="hero-form" action="{% url 'users:register' %}" method="get">
       <div class="input">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B6B6B" stroke-width="1.5">
           <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/>
         </svg>
-        <input type="text" placeholder="your-company.com" aria-label="website">
+        <input type="text" placeholder="your-dokan.com" aria-label="website">
       </div>
-      <button class="btn" type="submit">Get started
+      <button class="btn" type="submit">{{ site.primary_cta_label|default:"Get started" }}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </button>
     </form>
     <div class="social">
       <div class="avatars"><span>A</span><span>S</span><span>K</span><span>M</span><span>R</span></div>
-      <span>Loved by <b>{{ social_proof_count }}</b> users</span>
+      <span>Loved by <b>{{ site.social_proof_count|default:"15,285" }}</b> users</span>
     </div>
   </header>
 
@@ -47,25 +47,58 @@
     <div class="browser">
       <div class="chrome">
         <div class="dots"><i class="r"></i><i class="y"></i><i class="g"></i></div>
-        <div class="url">https://datafa.st/<b>codefa.st</b></div>
+        <div class="url">https://merodokan.app/<b>dashboard</b></div>
       </div>
       <div class="demo-grid">
         <div class="demo-chart"><canvas id="landing-chart"></canvas></div>
         <div class="demo-cards">
-          <div class="info-card">
-            <h3>Channel Attribution</h3>
-            <p>Discover which marketing channels bring customers so you can grow
-               your business, fast.</p>
-          </div>
-          <div class="info-card green">
-            <h3>Real-time Revenue</h3>
-            <p>Watch extracted invoice revenue update live as documents are
-               processed and saved.</p>
-          </div>
+          <div class="info-card"><h3>Scan &amp; extract</h3>
+            <p>Snap a receipt or estimate — Gemini turns it into structured stock and ledger entries.</p></div>
+          <div class="info-card green"><h3>Real-time Revenue</h3>
+            <p>Watch sales, purchases and stock update live as documents are processed.</p></div>
         </div>
       </div>
     </div>
   </section>
+
+  {% if features %}
+  <section id="features" style="padding:80px 0 20px">
+    {% for f in features %}
+    <div class="feature-row {% if f.layout == 'left' %}rev{% endif %}">
+      <div class="feature-media">{% if f.image %}<img src="{{ f.image.url }}" alt="{{ f.title }}">{% else %}<div class="feature-ph"></div>{% endif %}</div>
+      <div class="feature-copy"><h2>{{ f.title }}</h2><p>{{ f.body|linebreaksbr }}</p></div>
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {% if screenshots %}
+  <section id="screens" style="padding:40px 0">
+    <div class="screens-grid">
+      {% for s in screenshots %}
+      <figure class="shot chrome-{{ s.chrome }}"><img src="{{ s.image.url }}" alt="{{ s.caption }}">
+        {% if s.caption %}<figcaption>{{ s.caption }}</figcaption>{% endif %}</figure>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if downloads %}
+  <section id="download" style="padding:40px 0;text-align:center">
+    <h2 style="font-size:32px">Get the app</h2>
+    <div class="row" style="justify-content:center;margin-top:18px">
+      {% for d in downloads %}<a class="btn" href="{{ d.url }}">{{ d.label }}</a>{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <footer class="site-footer">
+    <div class="logo"><span class="mark">df</span> {{ site.brand_name|default:"Mero Dokan" }}</div>
+    <div class="footer-links">
+      {% for l in footer_links %}<a href="{{ l.href }}">{{ l.label }}</a>{% endfor %}
+    </div>
+    <p class="muted">© {{ site.brand_name|default:"Mero Dokan" }}</p>
+  </footer>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="{% static 'js/landing3d.js' %}"></script>

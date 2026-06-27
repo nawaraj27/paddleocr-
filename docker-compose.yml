@@ -15,7 +15,7 @@ services:
   web:
     build: .
     command: >
-      sh -c "python manage.py makemigrations users core uploads processing analytics &&
+      sh -c "python manage.py makemigrations users core uploads processing analytics stores cms inventory ledger &&
              python manage.py migrate &&
              gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"
     env_file: .env

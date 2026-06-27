@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Sales & purchases — Mero Dokan{% endblock %}
+{% block heading %}Sales &amp; purchases{% endblock %}
+{% block content %}
+<div class="filters">
+  <a class="btn sm {% if not kind %}{% else %}ghost{% endif %}" href="?">All</a>
+  <a class="btn sm {% if kind != 'sale' %}ghost{% endif %}" href="?kind=sale">Sales</a>
+  <a class="btn sm {% if kind != 'purchase' %}ghost{% endif %}" href="?kind=purchase">Purchases</a>
+  <a class="btn sm {% if kind != 'estimate' %}ghost{% endif %}" href="?kind=estimate">Estimates</a>
+</div>
+<table class="table" style="margin-top:14px">
+  <thead><tr><th>#</th><th>Type</th><th>Party</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for t in transactions %}
+    <tr><td>{{ t.number|default:t.id }}</td><td><span class="badge">{{ t.kind }}</span></td>
+      <td>{{ t.party.name|default:"—" }}</td><td>{{ t.date|default:"—" }}</td>
+      <td>{{ t.total|default:"—" }}</td>
+      <td><span class="status-chip status-completed">{{ t.status }}</span></td></tr>
+  {% empty %}<tr><td colspan="6" class="muted">No transactions yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

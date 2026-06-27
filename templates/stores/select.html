@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Select Store — Mero Dokan{% endblock %}
+{% block heading %}Your Stores{% endblock %}
+{% block content %}
+<div style="max-width:600px">
+  {% if stores %}
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
+      {% for store in stores %}
+      <div class="card" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px">
+        <div>
+          <div style="font-weight:600;font-size:16px">{{ store.name }}</div>
+          <div class="muted" style="font-size:13px">{{ store.currency }} · {{ store.address|default:"No address" }}</div>
+        </div>
+        <form method="post" action="{% url 'stores:switch' store.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{% url 'dashboard:index' %}">
+          <button class="btn sm" type="submit">Switch</button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">You don't have any stores yet. Create one to get started.</p>
+  {% endif %}
+  <a class="btn" href="{% url 'stores:create' %}">+ Create new store</a>
+</div>
+{% endblock %}

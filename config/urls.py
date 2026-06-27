@@ -13,6 +13,9 @@ urlpatterns = [
     path("uploads/", include("apps.uploads.urls")),
     path("processing/", include("apps.processing.urls")),
     path("analytics/", include("apps.analytics.urls")),
+    path("app/", include("apps.stores.urls")),
+    path("app/", include("apps.inventory.urls")),
+    path("app/", include("apps.ledger.urls")),
     # JSON APIs
     path("api/users/", include("apps.users.api_urls")),
     path("api/uploads/", include("apps.uploads.api_urls")),

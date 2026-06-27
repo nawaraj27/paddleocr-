@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Review & map — Mero Dokan{% endblock %}
+{% block heading %}Review &amp; map scans{% endblock %}
+{% block content %}
+<p class="muted">Extracted documents detected as sales, purchases or estimates.
+  Confirm a scan to post it to your ledger and update stock.</p>
+<table class="table" style="margin-top:14px">
+  <thead><tr><th>Document</th><th>Vendor/Party</th><th>Total</th>
+    <th>Detected</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for m in mappings %}
+    <tr>
+      <td>{{ m.document.invoice_number|default:m.document_id }}</td>
+      <td>{{ m.document.vendor_name|default:"—" }}</td>
+      <td>{{ m.document.total_amount|default:"—" }}</td>
+      <td><span class="badge">{{ m.detected_kind|default:"?" }}</span></td>
+      <td>{% if m.status == 'mapped' %}<span class="status-chip status-completed">mapped</span>
+          {% elif m.status == 'rejected' %}<span class="status-chip status-failed">rejected</span>
+          {% else %}<span class="status-chip status-pending">pending</span>{% endif %}</td>
+      <td>{% if m.status != 'mapped' %}<a class="btn sm" href="{% url 'ledger:review' m.id %}">Review</a>
+          {% else %}<span class="muted">→ txn #{{ m.transaction_id }}</span>{% endif %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="6" class="muted">No scans to review yet. Upload a receipt first.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

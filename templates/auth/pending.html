@@ -1,0 +1,14 @@
+{% load static %}<!doctype html>
+<html lang="en" data-theme="light"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pending approval — Mero Dokan</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/datafast.css' %}"></head>
+<body><div class="container" style="max-width:560px;text-align:center;padding-top:80px">
+  <div class="logo" style="justify-content:center"><span class="mark">df</span> Mero Dokan</div>
+  <h1 style="font-size:32px;margin-top:24px">Account pending approval</h1>
+  <p class="sub" style="font-size:18px">Your account was created and is waiting for an
+     admin to approve it and assign a role. You'll get access to the workspace once approved.</p>
+  <form method="post" action="{% url 'users:logout' %}" style="margin-top:20px">{% csrf_token %}
+    <button class="btn" type="submit">Log out</button></form>
+</div></body></html>

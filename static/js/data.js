@@ -36,6 +36,18 @@
   document.querySelectorAll(".view-btn").forEach(b =>
     b.addEventListener("click", () => openReview(b.dataset.id)));
 
+  // toggle items sub-row
+  document.querySelectorAll(".items-btn").forEach(b =>
+    b.addEventListener("click", () => {
+      const row = document.getElementById("items-" + b.dataset.id);
+      if (!row) return;
+      const visible = row.style.display !== "none";
+      row.style.display = visible ? "none" : "";
+      b.textContent = visible
+        ? `Items (${b.dataset.id})`.replace(/\(\d+\)/, m => m)
+        : b.textContent;
+    }));
+
   async function openReview(id) {
     currentId = id;
     try {

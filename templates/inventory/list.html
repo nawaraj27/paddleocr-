@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Inventory — Mero Dokan{% endblock %}
+{% block heading %}Inventory{% endblock %}
+{% block content %}
+<p class="muted">Stock balances are derived from posted purchases and sales. Add or edit
+  products in the <a href="/admin/inventory/product/">admin</a>.</p>
+<table class="table" style="margin-top:14px">
+  <thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>On hand</th>
+    <th>Cost</th><th>Sale</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for p in products %}
+    <tr><td>{{ p.sku }}</td><td>{{ p.name }}</td><td>{{ p.category.name|default:"—" }}</td>
+      <td>{{ p.quantity_on_hand }}</td><td>{{ p.cost_price|default:"—" }}</td>
+      <td>{{ p.sale_price|default:"—" }}</td>
+      <td>{% if p.low_stock %}<span class="status-chip status-processing">low</span>
+          {% else %}<span class="status-chip status-completed">ok</span>{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="7" class="muted">No products yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

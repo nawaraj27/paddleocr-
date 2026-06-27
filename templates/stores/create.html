@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Create Store — Mero Dokan{% endblock %}
+{% block heading %}Create a Store{% endblock %}
+{% block content %}
+<div style="max-width:480px">
+  {% if form.errors %}
+  <div class="msg error">
+    {% for f, errs in form.errors.items %}{{ f }}: {{ errs|join:", " }}<br>{% endfor %}
+  </div>
+  {% endif %}
+  <form method="post" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:14px;margin-top:8px">
+    {% csrf_token %}
+    <div class="input"><input name="name" placeholder="Store name" value="{{ form.name.value|default:'' }}" required></div>
+    <div class="input"><input name="currency" placeholder="Currency (e.g. NPR)" value="{{ form.currency.value|default:'NPR' }}"></div>
+    <div class="input"><input name="address" placeholder="Address (optional)" value="{{ form.address.value|default:'' }}"></div>
+    <div class="input"><input name="phone" placeholder="Phone (optional)" value="{{ form.phone.value|default:'' }}"></div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text2)">
+      <input type="checkbox" name="allow_negative_stock" {% if form.allow_negative_stock.value %}checked{% endif %}>
+      Allow negative stock
+    </label>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn" type="submit">Create store</button>
+      <a class="btn ghost" href="{% url 'stores:select' %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

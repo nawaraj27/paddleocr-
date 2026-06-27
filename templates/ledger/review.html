@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Review scan — Mero Dokan{% endblock %}
+{% block heading %}Review scan #{{ doc.id }}{% endblock %}
+{% block content %}
+<div class="viz-grid">
+  <div class="viz"><h3>Extracted JSON</h3>
+    <div style="padding:14px"><div id="raw-json" class="json-view"></div></div></div>
+  <div class="viz"><h3>Map to ledger</h3>
+   <div style="padding:16px">
+    <div class="row" style="margin-bottom:12px">
+      <label class="muted">Type</label>
+      <select class="field" id="m-kind">
+        {% for v,label in kinds %}<option value="{{ v }}" {% if v == mapping.detected_kind %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+      <input class="field" id="m-party" placeholder="Party / vendor name" value="{{ doc.vendor_name }}">
+      <input class="field" id="m-number" placeholder="Doc number" value="{{ doc.invoice_number }}">
+    </div>
+    <table class="table" id="line-table">
+      <thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th><th>Product</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="muted" style="margin-top:6px">Purchases add stock; sales subtract it; estimates change nothing.</p>
+    <div class="row" style="justify-content:flex-end;margin-top:14px">
+      <button class="btn sm ghost" id="reject-btn" type="button">Reject</button>
+      <button class="btn sm" id="confirm-btn" type="button">Confirm &amp; post</button>
+    </div>
+   </div>
+  </div>
+</div>
+{{ review_data|json_script:"review-data" }}
+<script src="{% static 'js/mapping.js' %}"></script>
+{% endblock %}

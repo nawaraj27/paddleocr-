@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}mero dokan{% endblock %}</title>
+  <title>{% block title %}datafast{% endblock %}</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/datafast.css' %}">
   {% block head %}{% endblock %}
@@ -12,15 +12,21 @@
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="logo"><span class="mark">md</span> Mero Dokan</div>
+    <div class="logo"><span class="mark">df</span> {{ active_store.name|default:"Mero Dokan" }}</div>
     {% url 'dashboard:index' as u_dash %}
     {% url 'uploads:index' as u_up %}
     {% url 'processing:data' as u_data %}
     {% url 'analytics:index' as u_an %}
+    {% url 'ledger:queue' as u_rev %}
+    {% url 'inventory:list' as u_inv %}
+    {% url 'ledger:transactions' as u_txn %}
     <a class="side-link {% if request.path == u_dash %}active{% endif %}" href="{{ u_dash }}"><span class="ico">▤</span> Dashboard</a>
-    {% if can_upload %}<a class="side-link {% if request.path == u_up %}active{% endif %}" href="{{ u_up }}"><span class="ico">⬆</span> Upload</a>{% endif %}
+    <a class="side-link {% if request.path == u_up %}active{% endif %}" href="{{ u_up }}"><span class="ico">⬆</span> Upload</a>
     <a class="side-link {% if request.path == u_data %}active{% endif %}" href="{{ u_data }}"><span class="ico">▦</span> Data viewer</a>
-    {% if can_view_analytics %}<a class="side-link {% if request.path == u_an %}active{% endif %}" href="{{ u_an }}"><span class="ico">◴</span> Analytics</a>{% endif %}
+    <a class="side-link {% if request.path == u_rev %}active{% endif %}" href="{{ u_rev }}"><span class="ico">⇄</span> Review &amp; map</a>
+    <a class="side-link {% if request.path == u_inv %}active{% endif %}" href="{{ u_inv }}"><span class="ico">▥</span> Inventory</a>
+    <a class="side-link {% if request.path == u_txn %}active{% endif %}" href="{{ u_txn }}"><span class="ico">₨</span> Sales &amp; purchases</a>
+    <a class="side-link {% if request.path == u_an %}active{% endif %}" href="{{ u_an }}"><span class="ico">◴</span> Analytics</a>
     {% if is_admin_role %}
     <a class="side-link {% if '/manage' in request.path %}active{% endif %}" href="{% url 'users:admin' %}"><span class="ico">⚙</span> Users</a>
     {% endif %}

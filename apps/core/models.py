@@ -72,6 +72,15 @@ class AuditLog(TimeStampedModel):
         return f"{who} {self.action} @ {self.created_at:%Y-%m-%d %H:%M}"
 
     @classmethod
+    def record_safe(cls, actor, action, target="", **metadata):
+        """Record an audit entry from a known user (no request object)."""
+        if actor is not None and not getattr(actor, "is_authenticated", False):
+            actor = None
+        return cls.objects.create(
+            actor=actor, action=action, target=str(target)[:255],
+            metadata=metadata or {})
+
+    @classmethod
     def record(cls, request, action, target="", **metadata):
         actor = getattr(request, "user", None)
         if actor is not None and not getattr(actor, "is_authenticated", False):

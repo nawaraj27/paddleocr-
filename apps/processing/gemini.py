@@ -31,7 +31,8 @@ from .schema import RESPONSE_SCHEMA
 
 # Built once; ~50 tokens. Reused for every call in the process.
 _SYSTEM_INSTRUCTION = (
-    "Extract invoice fields as strict JSON matching the schema. "
+    "Extract invoice/receipt fields as strict JSON matching the schema. "
+    "Set doc_type to sale, purchase, or estimate based on the document. "
     "Use null for missing fields. Numbers only for amounts. "
     "Return JSON only — no markdown, no commentary."
 )

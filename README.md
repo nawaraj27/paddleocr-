@@ -91,3 +91,33 @@ pytest          # schema, gemini mock, validators, upload→extract→save flow,
 ```
 
 > Note: migrations are generated on first `makemigrations` (not committed here).
+
+---
+
+## Storefront + workspace merge (Mero Dokan)
+
+The public landing page and the Gemini workspace are unified. New apps:
+
+- **`apps.stores`** — multi-tenant `Store` (Dokan, User 1:M) + `StoreMembership`
+  (per-store roles). `WorkspaceGuardMiddleware` locks the whole workspace behind
+  *authenticated → approved → active-store member*; `IsStoreMember` /
+  `HasStoreWriteRole` do the same for APIs. Landing & `/auth/` stay public.
+- **`apps.cms`** — admin-editable landing content (`SiteSettings`, `FeatureBlock`
+  alternating split grid, `Screenshot` device chromes, `PlatformDownload`,
+  `NavLink`). The landing template renders these dynamically with safe fallbacks.
+- **`apps.inventory`** — `Product` / `ProductCategory` (store-scoped) with an
+  append-only `StockMovement` ledger; `quantity_on_hand` is a cached projection.
+- **`apps.ledger`** — unified `Transaction` (sale/purchase/estimate) + `Line`,
+  `Party`, and `DocumentMapping` (audit binding each Gemini scan to the
+  transaction it produced).
+
+**Gemini extraction loop:** the existing pipeline now also classifies `doc_type`
+(token-frugal — one extra instruction line + two output fields). Upload → extract
+→ **Review & map** screen (`/app/review/`). On confirm, posting is atomic and
+idempotent: *purchases add stock, sales subtract it, estimates change nothing*;
+products are matched/created within the store; the document is bound to the
+resulting transaction via `DocumentMapping`.
+
+Workspace routes live under `/app/` (Review & map, Inventory, Sales & purchases);
+manage products/stores/content in Django admin. First run regenerates migrations:
+`makemigrations users core uploads processing analytics stores cms inventory ledger`.

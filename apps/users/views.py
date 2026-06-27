@@ -106,3 +106,10 @@ class UserApprovalActionView(LoginRequiredMixin, UserPassesTestMixin, View):
                             target=target.username, op="reject")
             messages.info(request, f"Rejected {target.username}.")
         return redirect(reverse("users:admin"))
+
+
+from django.views.generic import TemplateView as _TplView
+
+
+class PendingApprovalView(_TplView):
+    template_name = "auth/pending.html"

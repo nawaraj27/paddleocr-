@@ -12,6 +12,8 @@ from typing import Any
 
 # Field name -> (type, required). Kept tiny to minimize prompt tokens.
 INVOICE_FIELDS = {
+    "doc_type": ("string", False),
+    "party_name": ("string", False),
     "invoice_number": ("string", False),
     "vendor_name": ("string", False),
     "date": ("date", False),
@@ -26,6 +28,8 @@ INVOICE_FIELDS = {
 RESPONSE_SCHEMA = {
     "type": "object",
     "properties": {
+        "doc_type": {"type": "string", "enum": ["sale", "purchase", "estimate"]},
+        "party_name": {"type": "string"},
         "invoice_number": {"type": "string"},
         "vendor_name": {"type": "string"},
         "date": {"type": "string"},
@@ -94,6 +98,10 @@ def validate(raw: dict) -> ValidatedInvoice:
                              if raw.get("invoice_number") else None)
     out["vendor_name"] = (str(raw.get("vendor_name")).strip()
                           if raw.get("vendor_name") else None)
+    _dt = str(raw.get("doc_type") or "").strip().lower()
+    out["doc_type"] = _dt if _dt in ("sale", "purchase", "estimate") else None
+    out["party_name"] = (str(raw.get("party_name")).strip()
+                         if raw.get("party_name") else None)
     out["date"] = _date(raw.get("date"))
     out["currency"] = (str(raw.get("currency")).strip()[:8]
                        if raw.get("currency") else None)

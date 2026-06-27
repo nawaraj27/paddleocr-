@@ -14,3 +14,11 @@ Before first run you must:
 With no `GEMINI_API_KEY`, the system uses a deterministic **mock extractor**, so
 you can exercise upload → extraction → save → analytics end-to-end offline. Set
 `GEMINI_API_KEY` to switch to the real Gemini Vision API.
+
+## Update — storefront merge
+New apps added: stores, cms, inventory, ledger. Regenerate migrations including
+them (Docker does this automatically):
+  python manage.py makemigrations users core uploads processing analytics stores cms inventory ledger
+  python manage.py migrate
+Flow: register -> admin approves -> create a Store -> upload a receipt ->
+Review & map -> Confirm posts to Sales/Purchase ledger and updates Inventory.

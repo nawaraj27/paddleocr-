@@ -54,6 +54,10 @@ INSTALLED_APPS = [
     "apps.uploads",
     "apps.processing",
     "apps.analytics",
+    "apps.stores",
+    "apps.cms",
+    "apps.inventory",
+    "apps.ledger",
 ]
 
 MIDDLEWARE = [
@@ -63,6 +67,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.stores.middleware.WorkspaceGuardMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.core.middleware.AuditLogMiddleware",
@@ -82,6 +87,8 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.core.context_processors.app_context",
+                "apps.cms.context_processors.landing_content",
+                "apps.stores.context_processors.store_context",
             ],
         },
     },

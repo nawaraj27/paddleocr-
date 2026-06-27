@@ -26,6 +26,7 @@
     <th>Category</th><th>Saved</th><th></th></tr></thead>
   <tbody>
   {% for d in documents %}
+    {% with items=d.items.all %}
     <tr data-id="{{ d.id }}">
       <td>{{ d.invoice_number|default:"—" }}</td>
       <td>{{ d.vendor_name|default:"—" }}</td>
@@ -34,8 +35,31 @@
       <td>{{ d.category.name|default:"—" }}</td>
       <td>{% if d.is_saved %}<span class="status-chip status-completed">saved</span>
           {% else %}<span class="status-chip status-pending">draft</span>{% endif %}</td>
-      <td><button class="btn sm ghost view-btn" data-id="{{ d.id }}">Review</button></td>
+      <td style="display:flex;gap:6px">
+        {% if items %}<button class="btn sm ghost items-btn" data-id="{{ d.id }}">Items ({{ items|length }})</button>{% endif %}
+        <button class="btn sm ghost view-btn" data-id="{{ d.id }}">Review</button>
+      </td>
     </tr>
+    {% if items %}
+    <tr class="items-row" id="items-{{ d.id }}" style="display:none">
+      <td colspan="7" style="padding:0 12px 12px">
+        <table class="table" style="margin:0;font-size:13px">
+          <thead><tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Amount</th></tr></thead>
+          <tbody>
+          {% for item in items %}
+            <tr>
+              <td>{{ item.name|default:"—" }}</td>
+              <td>{{ item.quantity|default:"—" }}</td>
+              <td>{{ item.unit_price|default:"—" }}</td>
+              <td>{{ item.amount|default:"—" }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    {% endif %}
+    {% endwith %}
   {% empty %}<tr><td colspan="7" class="muted">No extractions yet.</td></tr>
   {% endfor %}
   </tbody>
