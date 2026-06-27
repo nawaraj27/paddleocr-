@@ -33,18 +33,14 @@ def env_list(key: str, default=""):
 
 
 # --- Core ------------------------------------------------------------------
-SECRET_KEY = env("DJANGO_SECRET_KEY", "dev-insecure-change-me")
-DEBUG = env_bool("DJANGO_DEBUG", True)
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "healthcheck.railway.app",
     "paddleocr-production-1eb8.up.railway.app",
 ]
-print("========== DJANGO START ==========")
-print("RAILWAY_PUBLIC_DOMAIN =", repr(_railway_domain))
+
 print("ALLOWED_HOSTS =", ALLOWED_HOSTS)
-print("DEBUG =", DEBUG)
-print("==================================")
 
 # Railway automatically sets RAILWAY_PUBLIC_DOMAIN — add it to ALLOWED_HOSTS
 _railway_domain = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "")
