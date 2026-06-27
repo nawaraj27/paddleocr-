@@ -42,14 +42,6 @@ ALLOWED_HOSTS = [
 
 print("ALLOWED_HOSTS =", ALLOWED_HOSTS)
 
-# Railway automatically sets RAILWAY_PUBLIC_DOMAIN — add it to ALLOWED_HOSTS
-_railway_domain = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "")
-if _railway_domain and _railway_domain not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append(_railway_domain)
-
-# Always allow Railway's internal healthcheck host
-ALLOWED_HOSTS.append("healthcheck.railway.app")
-
 # Add Railway domain to CSRF trusted origins automatically
 _railway_csrf = [f"https://{_railway_domain}"] if _railway_domain else []
 
