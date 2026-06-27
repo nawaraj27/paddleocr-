@@ -3,9 +3,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from django.http import HttpResponse
 from apps.core.views import LandingView
 
+
+def healthz(request):
+    return HttpResponse("ok", content_type="text/plain")
+
+
 urlpatterns = [
+    path("healthz/", healthz, name="healthz"),
     path("admin/", admin.site.urls),
     path("", LandingView.as_view(), name="landing"),
     path("auth/", include("apps.users.urls")),

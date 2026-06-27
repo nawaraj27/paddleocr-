@@ -13,7 +13,7 @@ from .models import Store, StoreMembership
 
 
 def _is_public(path: str) -> bool:
-    if path == "/":
+    if path in ("/", "/healthz/"):
         return True
     return path.startswith(("/auth/", "/admin/", "/static/", "/media/",
                             "/api/content/"))
