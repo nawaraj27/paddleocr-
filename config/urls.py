@@ -8,11 +8,12 @@ from apps.core.views import LandingView
 
 
 def healthz(request):
-    return HttpResponse("ok", content_type="text/plain")
+    print("HEALTH VIEW EXECUTED")
+    return HttpResponse("ok")
 
 
 urlpatterns = [
-    path("healthz/", healthz, name="healthz"),
+    path("healthz/", name="healthz"),
     path("admin/", admin.site.urls),
     path("", LandingView.as_view(), name="landing"),
     path("auth/", include("apps.users.urls")),
