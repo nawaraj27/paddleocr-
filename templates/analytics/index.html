@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Analytics — mero dokan{% endblock %}
+{% block heading %}Analytics{% endblock %}
+{% block content %}
+<div class="filters">
+  <select class="field" id="a-granularity">
+    <option value="day">Daily</option><option value="week">Weekly</option>
+    <option value="month">Monthly</option>
+  </select>
+  <input class="field" id="a-vendor" placeholder="Vendor…">
+  <select class="field" id="a-category"><option value="">All categories</option>
+    {% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+  </select>
+  <input class="field" id="a-from" type="date"><input class="field" id="a-to" type="date">
+  <button class="btn sm" id="a-apply" type="button">Apply</button>
+</div>
+
+<div class="cards" id="a-stats">
+  <div class="stat"><div class="v" id="m-docs">—</div><div class="l">Documents processed</div></div>
+  <div class="stat"><div class="v" id="m-rev">—</div><div class="l">Total revenue</div></div>
+  <div class="stat"><div class="v" id="m-aov">—</div><div class="l">Avg order value</div></div>
+</div>
+
+<div class="viz-grid" style="margin-top:18px">
+  <div class="viz full"><h3>Revenue trend (3D)</h3><div class="canvas-wrap" id="viz-trend"></div></div>
+  <div class="viz"><h3>Top products (3D bars)</h3><div class="canvas-wrap" id="viz-products"></div></div>
+  <div class="viz"><h3>Vendor share (3D pie)</h3><div class="canvas-wrap" id="viz-vendors"></div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="{% static 'js/analytics3d.js' %}"></script>
+{% endblock %}

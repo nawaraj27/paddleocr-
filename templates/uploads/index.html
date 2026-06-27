@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Upload — mero dokan{% endblock %}
+{% block heading %}Upload center{% endblock %}
+{% block content %}
+<div id="dropzone" class="dropzone">
+  <input id="file-input" type="file" multiple hidden
+         accept=".jpg,.jpeg,.png,.webp,.pdf">
+  <div style="font-size:34px">⬆</div>
+  <p style="font-size:18px;margin:8px 0 2px">Drag &amp; drop invoices/bills here</p>
+  <p class="muted">JPG, PNG, WEBP or PDF · up to the configured size limit · multiple files supported</p>
+  <button class="btn sm" type="button" id="browse-btn" style="margin-top:10px">Browse files</button>
+</div>
+<div id="upload-list" style="margin-top:18px"></div>
+<p class="muted" style="margin-top:14px">Files are validated, queued for Gemini extraction, then appear in the
+  <a href="{% url 'processing:data' %}">Data viewer</a> for review and saving.</p>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/upload.js' %}"></script>{% endblock %}

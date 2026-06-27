@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+db.sqlite3
+media/
+staticfiles/
+.pytest_cache/
+
+# Old OCR project (separate repo, archived here)
+_ocr_pipeline_project/
+datafast/

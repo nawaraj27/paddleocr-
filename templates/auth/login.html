@@ -1,0 +1,19 @@
+{% load static %}
+<!doctype html><html lang="en" data-theme="light"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in — mero dokan</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/datafast.css' %}"></head>
+<body><div class="container" style="max-width:440px;padding-top:64px">
+  <div class="logo" style="margin-bottom:24px"><span class="mark">md</span> Mero Dokan</div>
+  <h1 style="font-size:32px;letter-spacing:-1px">Welcome back</h1>
+  {% if messages %}{% for m in messages %}<div class="msg {{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+  <form method="post" style="display:flex;flex-direction:column;gap:14px;margin-top:18px">
+    {% csrf_token %}
+    <div class="input"><input name="username" placeholder="Username" required></div>
+    <div class="input"><input name="password" type="password" placeholder="Password" required></div>
+    <button class="btn" type="submit">Log in</button>
+  </form>
+  <p class="muted" style="margin-top:16px">No account?
+    <a href="{% url 'users:register' %}">Create one</a></p>
+</div></body></html>

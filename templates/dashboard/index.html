@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — mero dokan{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+{% block content %}
+<div class="cards">
+  <div class="stat"><div class="v">{{ total_documents }}</div><div class="l">Documents extracted</div></div>
+  <div class="stat"><div class="v">{{ pending_files }}</div><div class="l">In processing queue</div></div>
+  <div class="stat"><div class="v"><a class="btn sm" href="{% url 'uploads:index' %}">Upload</a></div><div class="l">Add new documents</div></div>
+</div>
+<h2 style="margin-top:28px;font-size:16px">Recent documents</h2>
+<table class="table">
+  <thead><tr><th>Invoice</th><th>Vendor</th><th>Date</th><th>Total</th><th>Category</th><th>Saved</th></tr></thead>
+  <tbody>
+  {% for d in recent %}
+    <tr><td>{{ d.invoice_number|default:"—" }}</td><td>{{ d.vendor_name|default:"—" }}</td>
+      <td>{{ d.invoice_date|default:"—" }}</td><td>{{ d.total_amount|default:"—" }}</td>
+      <td>{{ d.category.name|default:"—" }}</td>
+      <td>{% if d.is_saved %}<span class="status-chip status-completed">saved</span>{% else %}<span class="status-chip status-pending">draft</span>{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="6" class="muted">No documents yet. <a href="{% url 'uploads:index' %}">Upload some</a>.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
