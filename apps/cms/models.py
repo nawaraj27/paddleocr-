@@ -8,7 +8,7 @@ from apps.core.models import TimeStampedModel
 
 
 class SiteSettings(TimeStampedModel):
-    """Singleton holding global brand + hero copy."""
+    """Singleton holding global brand + hero copy + service keys."""
     brand_name = models.CharField(max_length=80, default="Mero Dokan")
     hero_headline = models.CharField(max_length=160,
                                      default="Revenue-first analytics")
@@ -21,6 +21,14 @@ class SiteSettings(TimeStampedModel):
     social_proof_count = models.CharField(max_length=20, default="15,285")
     primary_cta_label = models.CharField(max_length=40, default="Get started")
     primary_cta_href = models.CharField(max_length=200, default="/auth/register/")
+
+    # --- Service keys (never returned to frontend) ---
+    gemini_api_key = models.CharField(
+        max_length=200, blank=True, default="",
+        help_text="Gemini API key. Stored in DB; never exposed to frontend.")
+    gemini_model = models.CharField(
+        max_length=80, blank=True, default="",
+        help_text="Override Gemini model name (leave blank to use env default).")
 
     class Meta(TimeStampedModel.Meta):
         verbose_name = "Site settings"

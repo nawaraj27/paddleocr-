@@ -1,39 +1,35 @@
 """Token-optimized Gemini Vision extraction service.
 
-Design for token efficiency:
-* The system instruction (role + rules + schema) is built ONCE and cached per
-  process, never repeated per file.
-* The per-image user prompt is a single short line — no restated instructions.
-* We request ``response_mime_type=application/json`` + a compact response schema
-  so the model returns strict JSON (no markdown, no prose) and we don't spend
-  output tokens on formatting.
-* PDFs/images are sent as inline bytes; large images should be downsized by the
-  caller before reaching here.
-
-Security:
-* User-controlled text never enters the instruction. Image bytes are data, not
-  instructions; we also strip any model attempt to wrap JSON in prose.
-* The API key is read from settings (environment) only.
-
-When the SDK or key is unavailable, ``MockGeminiClient`` returns a deterministic
-JSON object parsed from any embedded text, so the pipeline is runnable offline.
+API key is fetched from the database via SettingsService (with 5-min cache).
+Falls back to env var for backwards compatibility.
+Key is never logged or exposed outside this module.
 """
 from __future__ import annotations
 
 import json
+import logging
 import re
 from dataclasses import dataclass
 from typing import Any
 
 from django.conf import settings
 
+from apps.core.services.settings_service import (
+    get_gemini_api_key, get_gemini_model,
+    GeminiKeyMissingError,
+)
 from .schema import RESPONSE_SCHEMA
+
+logger = logging.getLogger(__name__)
 
 # Built once; ~50 tokens. Reused for every call in the process.
 _SYSTEM_INSTRUCTION = (
     "Extract invoice/receipt fields as strict JSON matching the schema. "
     "Set doc_type to sale, purchase, or estimate based on the document. "
-    "Use null for missing fields. Numbers only for amounts. "
+    "The invoice may be in Nepali (Devanagari script) or English — extract text "
+    "exactly as written, preserving Nepali Unicode characters. "
+    "Use null for truly missing fields, never substitute null for readable text. "
+    "Numbers only for amounts. "
     "Return JSON only — no markdown, no commentary."
 )
 
@@ -49,29 +45,42 @@ class GeminiResult:
 
 
 class GeminiService:
+    # Class-level cache: keyed by api_key so stale keys auto-invalidate
     _client = None
-    _is_mock = False
+    _client_key: str = ""
+    _client_model: str = ""
 
     def __init__(self):
-        self.model_name = settings.GEMINI_MODEL
+        pass  # model/key resolved fresh from settings service each time
 
-    # -- client management (lazy, cached) ------------------------------
     def _get_client(self):
-        if GeminiService._client is not None:
-            return GeminiService._client
         try:
-            if not settings.GEMINI_API_KEY:
-                raise RuntimeError("no api key")
-            import google.generativeai as genai
-            genai.configure(api_key=settings.GEMINI_API_KEY)
-            GeminiService._client = genai.GenerativeModel(
-                model_name=self.model_name,
-                system_instruction=_SYSTEM_INSTRUCTION,
-            )
-            GeminiService._is_mock = False
-        except Exception:
-            GeminiService._client = MockGeminiClient()
-            GeminiService._is_mock = True
+            api_key = get_gemini_api_key()
+            model_name = get_gemini_model()
+        except GeminiKeyMissingError:
+            logger.warning("Gemini API key not configured — using mock extractor.")
+            return MockGeminiClient()
+
+        # Reset if key or model changed since last init
+        if (GeminiService._client is None
+                or GeminiService._client_key != api_key
+                or GeminiService._client_model != model_name
+                or isinstance(GeminiService._client, MockGeminiClient)):
+            try:
+                import google.generativeai as genai
+                genai.configure(api_key=api_key)
+                GeminiService._client = genai.GenerativeModel(
+                    model_name=model_name,
+                    system_instruction=_SYSTEM_INSTRUCTION,
+                )
+                GeminiService._client_key = api_key
+                GeminiService._client_model = model_name
+            except Exception:
+                logger.warning("Gemini client init failed — using mock extractor.")
+                GeminiService._client = MockGeminiClient()
+                GeminiService._client_key = ""
+                GeminiService._client_model = ""
+
         return GeminiService._client
 
     def extract(self, image_bytes: bytes, mime_type: str,
@@ -82,26 +91,25 @@ class GeminiService:
         return self._extract_real(client, image_bytes, mime_type)
 
     def _extract_real(self, client, image_bytes, mime_type) -> GeminiResult:
-        import google.generativeai as genai  # noqa: F401
+        model_name = get_gemini_model()
         generation_config = {
             "response_mime_type": "application/json",
             "response_schema": RESPONSE_SCHEMA,
-            "max_output_tokens": settings.GEMINI_MAX_OUTPUT_TOKENS,
+            "max_output_tokens": getattr(settings, "GEMINI_MAX_OUTPUT_TOKENS", 1024),
             "temperature": 0.0,
         }
-        # Single short user part + the image. No repeated instructions.
         parts = [
             {"mime_type": mime_type, "data": image_bytes},
             "Extract.",
         ]
         resp = client.generate_content(
             parts, generation_config=generation_config,
-            request_options={"timeout": settings.GEMINI_TIMEOUT_S})
+            request_options={"timeout": getattr(settings, "GEMINI_TIMEOUT_S", 60)})
         text = _response_text(resp)
         data = _coerce_json(text)
         usage = getattr(resp, "usage_metadata", None)
         return GeminiResult(
-            raw_text=text, data=data, model=self.model_name,
+            raw_text=text, data=data, model=model_name,
             prompt_tokens=getattr(usage, "prompt_token_count", None),
             output_tokens=getattr(usage, "candidates_token_count", None),
             backend="gemini")
