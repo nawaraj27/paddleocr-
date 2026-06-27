@@ -10,6 +10,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 import django
 django.setup()
 from django.db import connection
+
 for i in range(30):
     try:
         connection.ensure_connection()
@@ -29,6 +30,5 @@ python manage.py migrate --noinput
 echo "==> Ensuring superuser..."
 python manage.py ensure_superuser
 
-echo "==> Starting Django development server on port ${PORT:-8080}..."
+echo "==> Starting Django development server..."
 exec python manage.py runserver 0.0.0.0:${PORT:-8080}
-  
