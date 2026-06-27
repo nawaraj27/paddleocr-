@@ -15,7 +15,7 @@ RUN DJANGO_SECRET_KEY=build-time-placeholder \
     DJANGO_DEBUG=False \
     python manage.py collectstatic --noinput
 
-RUN chmod +x release.sh
+RUN chmod +x release.sh start.sh
 
 EXPOSE 8000
 
