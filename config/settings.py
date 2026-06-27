@@ -35,7 +35,7 @@ def env_list(key: str, default=""):
 # --- Core ------------------------------------------------------------------
 SECRET_KEY = env("DJANGO_SECRET_KEY", "dev-insecure-change-me")
 DEBUG = env_bool("DJANGO_DEBUG", True)
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = [*]
 
 # Railway automatically sets RAILWAY_PUBLIC_DOMAIN — add it to ALLOWED_HOSTS
 _railway_domain = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "")
