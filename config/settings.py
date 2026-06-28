@@ -31,8 +31,12 @@ def env_list(key: str, default=""):
     raw = os.environ.get(key, default)
     return [x.strip() for x in raw.split(",") if x.strip()]
 
-
 # --- Core ------------------------------------------------------------------
+SECRET_KEY = env("DJANGO_SECRET_KEY", "build-time-placeholder")
+DEBUG = env_bool("DJANGO_DEBUG", False)
+
+_railway_domain = env("RAILWAY_PUBLIC_DOMAIN", "")
+
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
@@ -40,12 +44,12 @@ ALLOWED_HOSTS = [
     "paddleocr-production-1eb8.up.railway.app",
 ]
 
+if _railway_domain:
+    ALLOWED_HOSTS.append(_railway_domain)
+
 print("ALLOWED_HOSTS =", ALLOWED_HOSTS)
 
-# Add Railway domain to CSRF trusted origins automatically
-_railway_domain = env("RAILWAY_PUBLIC_DOMAIN", "")
 _railway_csrf = [f"https://{_railway_domain}"] if _railway_domain else []
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -231,7 +235,7 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
-DEBUG = env_bool("DJANGO_DEBUG", False)
+
 # --- Security --------------------------------------------------------------
 CSRF_COOKIE_HTTPONLY = False        # JS needs to read token for fetch header
 CSRF_COOKIE_SAMESITE = "Lax"
