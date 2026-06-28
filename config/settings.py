@@ -259,6 +259,8 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = env("TIME_ZONE", "UTC")
 USE_I18N = True
 USE_TZ = True
+print("CELERY_TASK_ALWAYS_EAGER =", CELERY_TASK_ALWAYS_EAGER)
+print("SECRET_KEY EXISTS =", bool(SECRET_KEY))
 
 # --- Logging ---------------------------------------------------------------
 LOGGING = {
