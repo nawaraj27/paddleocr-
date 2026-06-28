@@ -55,10 +55,13 @@ class UploadIngestView(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 def _queue_processing(file_id: int):
-    """Dispatch the Celery task (eager in dev)."""
     from apps.processing.tasks import process_file
+
+    print("QUEUEING FILE:", file_id)
+
     try:
-        process_file.delay(file_id)
-    except Exception:
-        # Broker down: run inline so dev still works.
+        result = process_file.delay(file_id)
+        print("CELERY RESULT:", result)
+    except Exception as e:
+        print("CELERY FAILED:", e)
         process_file(file_id)
