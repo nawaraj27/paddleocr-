@@ -43,6 +43,7 @@ ALLOWED_HOSTS = [
 print("ALLOWED_HOSTS =", ALLOWED_HOSTS)
 
 # Add Railway domain to CSRF trusted origins automatically
+_railway_domain = env("RAILWAY_PUBLIC_DOMAIN", "")
 _railway_csrf = [f"https://{_railway_domain}"] if _railway_domain else []
 
 INSTALLED_APPS = [
