@@ -22,7 +22,17 @@ class DataViewerView(LoginRequiredMixin, TemplateView):
         ctx["documents"] = qs[:200]
         ctx["categories"] = Category.objects.order_by("name")
         return ctx
+def _queue_processing(file_id):
+    from apps.processing.tasks import process_file
 
+    print("QUEUE", file_id)
+
+    try:
+        result = process_file.delay(file_id)
+        print("DELAY RETURNED", result)
+    except Exception as e:
+        print("DELAY ERROR", e)
+        process_file(file_id)
 
 class ExportView(LoginRequiredMixin, View):
     """Export filtered documents as csv | xlsx | json."""
