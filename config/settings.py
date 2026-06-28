@@ -231,7 +231,7 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
-
+DEBUG = env_bool("DJANGO_DEBUG", False)
 # --- Security --------------------------------------------------------------
 CSRF_COOKIE_HTTPONLY = False        # JS needs to read token for fetch header
 CSRF_COOKIE_SAMESITE = "Lax"
